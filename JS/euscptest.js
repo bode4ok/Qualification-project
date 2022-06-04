@@ -70,7 +70,7 @@ var EUSignCPTest = NewClass({
 	},
 	{
 
-		// ІНІЦІАЛІЗАЦІЯ БІБЛІОТЕКИ ****************************************************************************************************
+		//1// ІНІЦІАЛІЗАЦІЯ БІБЛІОТЕКИ ****************************************************************************************************
 
 		initialize: function () {
 			setStatus('ініціалізація');
@@ -102,16 +102,12 @@ var EUSignCPTest = NewClass({
 					euSignTest.loadCertsFromServer();
 					euSignTest.setCASettings(0);
 
-					euSignTest.setSelectPKCertificatesEvents();
-
 					if (utils.IsSessionStorageSupported()) {
 						var _readPrivateKeyAsStoredFile = function () {
 							euSignTest.readPrivateKeyAsStoredFile();
 						}
 						setTimeout(_readPrivateKeyAsStoredFile, 10);
 					}
-
-					euSignTest.updateCertList();
 
 					setStatus('');
 				} catch (e) {
@@ -129,7 +125,7 @@ var EUSignCPTest = NewClass({
 			euSignTest.loadCAsSettings(_onSuccess, _onError);
 		},
 
-		//@@@ ****************************************************************************************************
+		//2// завантажити налаштування CA ****************************************************************************************************
 
 		loadCAsSettings: function (onSuccess, onError) {
 			var pThis = this;
@@ -164,7 +160,7 @@ var EUSignCPTest = NewClass({
 			euSign.LoadDataFromServer(URL_CAS, _onSuccess, onError, false);
 		},
 
-		//@@@ ****************************************************************************************************
+		//3// завантажити сертифікати з сервера ****************************************************************************************************
 
 		loadCertsFromServer: function () {
 			var certificates = utils.GetSessionStorageItem(
@@ -172,7 +168,6 @@ var EUSignCPTest = NewClass({
 			if (certificates != null) {
 				try {
 					euSign.SaveCertificates(certificates);
-					euSignTest.updateCertList();
 					return;
 				} catch (e) {
 					alert("Виникла помилка при імпорті " +
@@ -187,7 +182,6 @@ var EUSignCPTest = NewClass({
 					utils.SetSessionStorageItem(
 						euSignTest.CACertificatesSessionStorageName,
 						certificates, false);
-					euSignTest.updateCertList();
 				} catch (e) {
 					alert("Виникла помилка при імпорті " +
 						"завантажених з сервера сертифікатів " +
@@ -203,7 +197,7 @@ var EUSignCPTest = NewClass({
 			utils.GetDataFromServerAsync(URL_GET_CERTIFICATES, _onSuccess, _onFail, true);
 		},
 
-		//@@@ ****************************************************************************************************
+		//4// встановити параметри за замовчуванням ****************************************************************************************************
 
 		setDefaultSettings: function () {
 			try {
@@ -249,7 +243,7 @@ var EUSignCPTest = NewClass({
 			}
 		},
 
-		//@@@ ****************************************************************************************************
+		//5// встановити параметри ЦС ****************************************************************************************************
 
 		setCASettings: function (caIndex) {
 			try {
@@ -268,8 +262,6 @@ var EUSignCPTest = NewClass({
 				euSignTest.loadPKCertsFromFile = loadPKCertsFromFile;
 
 				var settings;
-
-				euSignTest.clearPrivateKeyCertificatesList();
 
 				settings = euSign.CreateTSPSettings();
 				if (!offline) {
@@ -308,76 +300,9 @@ var EUSignCPTest = NewClass({
 			}
 		},
 
-		//@@@ ****************************************************************************************************
+		//6// випадаючий список ЦСК ****************************************************************************************************
 
-		updateCertList: function () {
-			var certSubjType = SubjectCertTypes[0];          // index [0]
-			var certKeyType = CertKeyTypes[0];               // index [0]
-			var keyUsage = KeyUsages[0];				     // index [0]
-
-			try {
-				var index = 0;
-				var cert;
-				var certs = [];
-
-				while (true) {
-					cert = euSign.EnumCertificatesEx(
-						certSubjType.type, certSubjType.subtype,
-						certKeyType, keyUsage, index);
-					if (cert == null)
-						break;
-
-					certs.push(cert);
-					index++;
-				};
-
-				var _makeCertField = function (name, value, addNewLine) {
-					return name + ': ' +
-						value +
-						(addNewLine ? '<br>' : '');
-				}
-
-				var certInfos = [];
-
-				for (var i = 0; i < certs.length; i++) {
-					var certInfoStr = '';
-					var certInfo = certs[i].GetInfoEx();
-					var publicKeyType = '';
-					switch (certInfo.GetPublicKeyType()) {
-						case EU_CERT_KEY_TYPE_DSTU4145:
-							publicKeyType += 'ДСТУ-4145';
-							break;
-						case EU_CERT_KEY_TYPE_RSA:
-							publicKeyType += 'RSA';
-							break;
-						case EU_CERT_KEY_TYPE_ECDSA:
-							publicKeyType += 'ECDSA';
-							break;
-						default:
-							publicKeyType = 'Невизначено';
-							break;
-					}
-
-					certInfoStr += _makeCertField('Власник', certInfo.GetSubjCN(), true);
-					certInfoStr += _makeCertField('ЦСК', certInfo.GetIssuerCN(), true);
-					certInfoStr += _makeCertField('Серійний номер', certInfo.GetSerial(), true);
-					certInfoStr += _makeCertField('Тип', publicKeyType, true);
-					certInfoStr += _makeCertField('Призначення', certInfo.GetKeyUsage(), false);
-
-					certInfos.push(certInfoStr);
-				}
-
-				// euSignTest.setItemsToList(
-				// 	'StorageCertList', certInfos);
-			} catch (e) {
-				alert("Виникла помилка при " +
-					"отриманні сертифікатів з файлового сховища: " + e);
-			}
-		},
-
-		//@@@ ****************************************************************************************************
-
-		getCAServer: function () {
+		getCAServer: function () { // отримати CA Server
 			var index = document.getElementById("CAsServersSelect").selectedIndex;
 
 			if (index < euSignTest.CAsServers.length)
@@ -385,7 +310,7 @@ var EUSignCPTest = NewClass({
 
 			return null;
 		},
-		loadCAServer: function () {
+		loadCAServer: function () { // завантажити сервер ЦС
 			var index = utils.GetSessionStorageItem(
 				euSignTest.CAServerIndexSessionStorageName, false, false);
 			if (index != null) {
@@ -394,17 +319,17 @@ var EUSignCPTest = NewClass({
 				euSignTest.setCASettings(parseInt(index));
 			}
 		},
-		storeCAServer: function () {
+		storeCAServer: function () { // зберігати сервер CA
 			var index = document.getElementById("CAsServersSelect").selectedIndex;
 			return utils.SetSessionStorageItem(
 				euSignTest.CAServerIndexSessionStorageName, index.toString(), false);
 		},
-		removeCAServer: function () {
+		removeCAServer: function () { // видалити сервер CA
 			utils.RemoveSessionStorageItem(
 				euSignTest.CAServerIndexSessionStorageName);
 		},
 
-		//@@@ ****************************************************************************************************
+		//7// зберігає закритий ключ ****************************************************************************************************
 
 		storePrivateKey: function (keyName, key, password, certificates) {
 			if (!utils.SetSessionStorageItem(
@@ -434,7 +359,7 @@ var EUSignCPTest = NewClass({
 			return true;
 		},
 
-		//@@@ ****************************************************************************************************
+		//8// видалити збережений закритий ключ (при натисканні видаляє данні авторизованого користувача) ****************************************************************************************************
 
 		removeStoredPrivateKey: function () {
 			utils.RemoveSessionStorageItem(
@@ -451,7 +376,7 @@ var EUSignCPTest = NewClass({
 			euSignTest.removeCAServer();
 		},
 
-		//@@@ ****************************************************************************************************
+		//9// виберіть Файл приватного ключа ****************************************************************************************************
 
 		selectPrivateKeyFile: function (event) {
 			var enable = (event.target.files.length == 1);
@@ -470,7 +395,7 @@ var EUSignCPTest = NewClass({
 			}
 		},
 
-		//@@@ ****************************************************************************************************
+		//10// отримати сертифікати приватного ключа від CMP ****************************************************************************************************
 
 		getPrivateKeyCertificatesByCMP: function (key, password, onSuccess, onError) {
 			try {
@@ -482,7 +407,7 @@ var EUSignCPTest = NewClass({
 			}
 		},
 
-		//@@@ ****************************************************************************************************
+		//11// отримати сертифікати приватного ключа ****************************************************************************************************
 
 		getPrivateKeyCertificates: function (key, password, fromCache, onSuccess, onError) {
 			var certificates;
@@ -512,7 +437,6 @@ var EUSignCPTest = NewClass({
 					for (var i = 0; i < files.length; i++) {
 						certificates.push(files[i].data);
 					}
-
 					onSuccess(certificates);
 				};
 
@@ -522,7 +446,7 @@ var EUSignCPTest = NewClass({
 			}
 		},
 
-		//@@@ ****************************************************************************************************
+		//12// прочитати закритий ключ ****************************************************************************************************
 
 		readPrivateKey: function (keyName, key, password, certificates, fromCache) {
 			var _onError = function (e) {
@@ -537,10 +461,6 @@ var EUSignCPTest = NewClass({
 
 				if (e.GetErrorCode != null &&
 					e.GetErrorCode() == EU_ERROR_CERT_NOT_FOUND) {
-
-					euSignTest.mainMenuItemClicked(
-						document.getElementById('MainPageMenuCertsAndCRLs'),
-						'MainPageMenuCertsAndCRLsPage');
 				}
 			};
 
@@ -579,8 +499,6 @@ var EUSignCPTest = NewClass({
 
 				euSignTest.privateKeyReaded(true);
 
-				euSignTest.updateCertList();
-
 				if (!fromCache)
 					euSignTest.showOwnerInfo();
 			} catch (e) {
@@ -588,7 +506,7 @@ var EUSignCPTest = NewClass({
 			}
 		},
 
-		//@@@ ****************************************************************************************************
+		//13// прочитати закритий ключ як збережений файл (після перезапуску строрінки) ****************************************************************************************************
 
 		readPrivateKeyAsStoredFile: function () {
 			var keyName = utils.GetSessionStorageItem(
@@ -614,7 +532,7 @@ var EUSignCPTest = NewClass({
 			return;
 		},
 
-		// ЗЧИТУВАННЯ ОСОБИСТОГО КЛЮЧА (НАТИСКАННЯ НА КНОПКУ ЗЧИТАТИ) //****************************************************************************************************
+		//14// ЗЧИТУВАННЯ ОСОБИСТОГО КЛЮЧА (НАТИСКАННЯ НА КНОПКУ ЗЧИТАТИ) //****************************************************************************************************
 
 		readPrivateKeyButtonClick: function () {
 			var passwordTextField = document.getElementById('PKeyPassword');
@@ -672,14 +590,13 @@ var EUSignCPTest = NewClass({
 					euSign.ResetPrivateKey();
 					euSignTest.privateKeyReaded(false);
 					passwordTextField.value = "";
-					euSignTest.clearPrivateKeyCertificatesList();
 				}
 			} catch (e) {
 				_onError(e);
 			}
 		},
 
-		// ПРОДЕМОНСТРУВАТИ ІНФОРМАЦІЮ КОРИСТУВАЧА //****************************************************************************************************
+		//15// ПРОДЕМОНСТРУВАТИ ІНФОРМАЦІЮ КОРИСТУВАЧА //****************************************************************************************************
 
 		showOwnerInfo: function () {
 			try {
@@ -693,7 +610,7 @@ var EUSignCPTest = NewClass({
 			}
 		},
 
-		// ПРОДЕМОНСТРУВАТИ ІНФОРМАЦІЮ ПРО СЕРТИФІКАТИ КОРИСТУВАЧА //****************************************************************************************************
+		//16// ПРОДЕМОНСТРУВАТИ ІНФОРМАЦІЮ ПРО СЕРТИФІКАТИ КОРИСТУВАЧА //****************************************************************************************************
 
 		showOwnCertificates: function () {
 			try {
@@ -731,7 +648,7 @@ var EUSignCPTest = NewClass({
 			}
 		},
 
-		// ОТРИМАТИ ІНФОРМАЦІЮ ПРО КОНТЕЙНЕР JKS (ЗБЕРІГАННЯ ІНФОРМАЦІЙ ПРО КЛЮЧ) //****************************************************************************************************
+		//17// ОТРИМАТИ ІНФОРМАЦІЮ ПРО КОНТЕЙНЕР JKS (ЗБЕРІГАННЯ ІНФОРМАЦІЙ ПРО КЛЮЧ) //****************************************************************************************************
 
 		getJKSContainerInfo: function (jksContainer, password) {
 			var info = '\tІнформація про JKS контейнер:\n';
@@ -777,6 +694,8 @@ var EUSignCPTest = NewClass({
 
 			return info;
 		},
+
+		//18// ЗБЕРЕГТИ ІНФОРМАЦІЮ ПРО КЛЮЧ //****************************************************************************************************
 
 		savePKeyInfo: function () {
 			var pThis = this;
@@ -854,38 +773,23 @@ var EUSignCPTest = NewClass({
 			});
 		},
 
-		// НАЛАШТУВАННЯ ПІДПИСУ //****************************************************************************************************
+		//19// НАЛАШТУВАННЯ ПІДПИСУ //****************************************************************************************************
 
 		signData: function () {
 			var isInternalSign =
 				document.getElementById("InternalSignCheckbox").checked;
-			var isAddCert =
-				document.getElementById("AddCertToInternalSignCheckbox").checked;
-			var isSignHash =
-				document.getElementById("SignHashCheckbox").checked;
-			// var dsAlgType = parseInt(document.getElementById("DSAlgTypeSelect").value) // Here is change +-
-			var dsAlgType = parseInt("1"); // Here is change +-
 
 			signedDataText.value = "";
 
 			var _signDataFunction = function () {
 				try {
 					var sign = "";
-					if (dsAlgType == 1) {
+
 						if (isInternalSign) {
-							sign = euSign.SignDataInternal(isAddCert, data, true);
+							sign = euSign.SignDataInternal(false, data, true);
 						} else {
-							if (isSignHash) {
-								var hash = euSign.HashData(data);
-								sign = euSign.SignHash(hash, true);
-							} else {
 								sign = euSign.SignData(data, true);
-							}
 						}
-					} else {
-						sign = euSign.SignDataRSA(data, isAddCert,
-							!isInternalSign, true);
-					}
 
 					signedDataText.value = sign;
 					setStatus('');
@@ -899,7 +803,7 @@ var EUSignCPTest = NewClass({
 			setTimeout(_signDataFunction, 10);
 		},
 
-		//?????????  // ОТРИМАТИ РЯДОК ТИПУ ЗНАКА //****************************************************************************************************
+		//20// ОТРИМАТИ ФОРМАТУ ПІДПИСУ //****************************************************************************************************
 
 		getSignTypeString: function (signType) {
 			switch (signType) {
@@ -918,19 +822,13 @@ var EUSignCPTest = NewClass({
 			}
 		},
 
-		// ПЕРЕВІРКА ПІДПИСУ //****************************************************************************************************
+		//21// ПЕРЕВІРКА ПІДПИСУ (ВИВІД ІНВОРМАЦІЇ В АЛЕРТ) //****************************************************************************************************
 
 		verifyData: function () {
-			var pThis = this;
 			var isInternalSign =
 				document.getElementById("InternalSignCheckbox").checked;
-			var isSignHash =
-				document.getElementById("SignHashCheckbox").checked;
 			var isGetSignerInfo =
 				document.getElementById("GetSignInfoCheckbox").checked;
-			// var dsAlgType = parseInt(document.getElementById("DSAlgTypeSelect").value) // Here is change +-
-			var dsAlgType = parseInt("1"); // Here is change +-
-
 
 			var _verifyDataFunction = function () {
 				try {
@@ -978,25 +876,7 @@ var EUSignCPTest = NewClass({
 			setTimeout(_verifyDataFunction, 10);
 		},
 
-		//@@@ ****************************************************************************************************
-
-		chooseFileToSign: function (event) {
-			var enable = (event.target.files.length == 1);
-
-			setPointerEvents(document.getElementById('SignFileButton'), enable);
-		},
-
-		//@@@ ****************************************************************************************************
-
-		chooseFileToVerify: function (event) {
-			var enable = (document.getElementById('FileToVerify').files.length == 1) &&
-				(document.getElementById("InternalSignCheckbox").checked ||
-					document.getElementById('FileWithSign').files.length == 1)
-
-			setPointerEvents(document.getElementById('VerifyFileButton'), enable);
-		},
-
-		//@@@ ****************************************************************************************************
+		//22// ПІДПИСАННЯ ФАЙЛУ ****************************************************************************************************
 
 		signFile: function () {
 			var file = document.getElementById('FileToSign').files[0];
@@ -1015,26 +895,18 @@ var EUSignCPTest = NewClass({
 
 					var isInternalSign =
 						document.getElementById("InternalSignCheckbox").checked;
-					var isAddCert = document.getElementById(
-						"AddCertToInternalSignCheckbox").checked;
-					// var dsAlgType = parseInt(
-					// 	document.getElementById("DSAlgTypeSelect").value);  // Here is change +-
-					var dsAlgType = parseInt("1"); // Here is change +-
 
 					var data = new Uint8Array(evt.target.result);
 
 					try {
 						var sign;
 
-						if (dsAlgType == 1) {
+
 							if (isInternalSign)
-								sign = euSign.SignDataInternal(isAddCert, data, false);
+								sign = euSign.SignDataInternal(false, data, false);
 							else
 								sign = euSign.SignData(data, false);
-						} else {
-							sign = euSign.SignDataRSA(data, isAddCert,
-								!isInternalSign, false);
-						}
+
 
 						saveFile(fileName + ".p7s", sign);
 
@@ -1051,7 +923,7 @@ var EUSignCPTest = NewClass({
 			fileReader.readAsArrayBuffer(file);
 		},
 
-		//@@@ ****************************************************************************************************
+		//23// ПЕРЕВІРКА ПІДПИСАНОГО ФАЙЛУ ****************************************************************************************************
 
 		verifyFile: function () {
 			var pThis = this;
@@ -1106,11 +978,6 @@ var EUSignCPTest = NewClass({
 						message += '\nТип підпису: ' + signType;
 					}
 
-					if (isInternalSign) {
-						saveFile(files[0].name.substring(0,
-							files[0].name.length - 4), info.GetData());
-					}
-
 					alert(message);
 					setStatus('');
 				} catch (e) {
@@ -1128,62 +995,25 @@ var EUSignCPTest = NewClass({
 			utils.LoadFilesToArray(files, _onSuccess, _onFail);
 		},
 
-		//@@@ ****************************************************************************************************
-
-		isCertificateExtension: function (fileName) {
-			if ((fileName.indexOf(".cer") >= 0) ||
-				(fileName.indexOf(".p7b") >= 0))
-				return true;
-			return false;
-		},
-		isCRLExtension: function (fileName) {
-			if ((fileName.indexOf(".crl") >= 0))
-				return true;
-			return false;
-		},
-
-		//@@@ ****************************************************************************************************
+		//24// НАЛАШТУВАННЯ ПРАПОРЦІВ (Використовувати внутрішній підпис блокування поля підписаний файл) Checkbox //****************************************************************************************************
 
 		useInternalSignCheckBoxClick: function () {
 			var intSignCheckbox =
 				document.getElementById("InternalSignCheckbox");
-			var addCertToIntSignCheckbox =
-				document.getElementById("AddCertToInternalSignCheckbox");
-			var signHashCheckbox =
-				document.getElementById("SignHashCheckbox");
-			var verifiedDataText =
-				document.getElementById("VerifiedDataText");
+
 			var fileWithSignSelectFile =
 				document.getElementById("FileWithSign");
 
 			if (intSignCheckbox.checked) {
-				addCertToIntSignCheckbox.disabled = '';
-				verifiedDataText.disabled = '';
-				signHashCheckbox.disabled = 'disabled';
+
 				fileWithSignSelectFile.disabled = 'disabled';
 			} else {
-				addCertToIntSignCheckbox.disabled = 'disabled';
-				verifiedDataText.disabled = 'disabled';
-				signHashCheckbox.disabled = '';
+
 				fileWithSignSelectFile.disabled = '';
 			}
 		},
 
-		//@@@ ****************************************************************************************************
-
-		signHashCheckBoxClick: function () {
-			var intSignCheckbox =
-				document.getElementById("InternalSignCheckbox");
-			var signHashCheckbox =
-				document.getElementById("SignHashCheckbox");
-			if (signHashCheckbox.checked) {
-				intSignCheckbox.disabled = 'disabled';
-			} else {
-				intSignCheckbox.disabled = '';
-			}
-		},
-
-		//@@@ ****************************************************************************************************
+		//25// ОБРАННЯ ФОРМАТУ ПІДПИСУ З ВИПАДАЮЧОГО СПИСКУ ****************************************************************************************************
 
 		DSCAdESTypeChanged: function () {
 			var signType = CAdESTypes[
@@ -1199,7 +1029,7 @@ var EUSignCPTest = NewClass({
 					EU_SIGN_TYPE_CADES_X_LONG) ? '' : 'disabled';
 		},
 
-		//@@@ ****************************************************************************************************
+		//26// ДОДАТИ ПОЗНАЧКУ ЧАСУ ВІД ДАНИХ Checkbox ****************************************************************************************************
 
 		signAddContentTimestampCheckBoxClick: function () {
 			try {
@@ -1210,7 +1040,7 @@ var EUSignCPTest = NewClass({
 			}
 		},
 
-		//@@@ ****************************************************************************************************
+		//26// ДОДАТИ ПОВНІ ДАНІ ДЛЯ ПЕРЕВІРКИ Checkbox ****************************************************************************************************
 
 		signAddCAsCertificatesCheckBoxClick: function () {
 			try {
@@ -1221,7 +1051,7 @@ var EUSignCPTest = NewClass({
 			}
 		},
 
-		//@@@ ****************************************************************************************************
+		//28// ПРИВАТНИЙ КЛЮЧ ЗЧИТАНО (БЛОКУВАННЯ ПОЛІВ) ****************************************************************************************************
 
 		privateKeyReaded: function (isReaded) {
 			var enabled = '';
@@ -1238,19 +1068,17 @@ var EUSignCPTest = NewClass({
 			setPointerEvents(document.getElementById('PKeySelectFileButton'), !isReaded);
 			document.getElementById('PKeyFileName').disabled = disabled;
 
-			document.getElementById('PKeyReadButton').title =
-				isReaded ? 'Стерти' : 'Зчитати';
-			document.getElementById('PKeyReadButton').innerHTML =
-				isReaded ? 'Стерти' : 'Зчитати';
+			document.getElementById('PKeyReadButton').title = isReaded ? 'Стерти' : 'Зчитати';
+			document.getElementById('PKeyReadButton').innerHTML = isReaded ? 'Стерти' : 'Зчитати';
 
-			document.getElementById('KeyReadedImage').style.display = isReaded ?
-				"inline" : 'none';
+			document.getElementById('KeyReadedImage').style.display = isReaded ? "inline" : 'none';
 
 			setPointerEvents(document.getElementById('PKeyShowOwnerInfoButton'), isReaded);
 			setPointerEvents(document.getElementById('PKeyShowCertsInfoButton'), isReaded);
 			setPointerEvents(document.getElementById('PKeySaveInfo'), isReaded);
 
 			document.getElementById('PKeyPassword').disabled = disabled;
+
 			if (!isReaded) {
 				document.getElementById('PKeyPassword').value = '';
 				document.getElementById('PKeyPassword').disabled = 'disabled';
@@ -1261,54 +1089,6 @@ var EUSignCPTest = NewClass({
 			document.getElementById('FileToSign').disabled = enabled;
 			setPointerEvents(document.getElementById('SignFileButton'), isReaded);
 		},
-
-		//@@@ ****************************************************************************************************
-
-		setSelectPKCertificatesEvents: function () {
-			document.getElementById('ChoosePKCertsInput').addEventListener(
-				'change', function (evt) {
-					if (evt.target.files.length <= 0) {
-						euSignTest.clearPrivateKeyCertificatesList();
-					} else {
-						euSignTest.privateKeyCerts = evt.target.files;
-						euSignTest.setFileItemsToList("SelectedPKCertsList",
-							evt.target.files);
-					}
-				}, false);
-		},
-
-		//@@@ ****************************************************************************************************
-
-		clearPrivateKeyCertificatesList: function () {
-			euSignTest.privateKeyCerts = null;
-			document.getElementById('ChoosePKCertsInput').value = null;
-			document.getElementById('SelectedPKCertsList').innerHTML =
-				"Сертифікати відкритого ключа не обрано" + '<br>';
-		},
-
-		//@@@ ****************************************************************************************************
-
-		setItemsToList: function (listId, items) {
-			var output = [];
-			for (var i = 0, item; item = items[i]; i++) {
-				output.push('<li><strong>', item, '</strong></li>');
-			}
-
-			document.getElementById(listId).innerHTML =
-				'<ul>' + output.join('') + '</ul>';
-		},
-
-		//@@@ ****************************************************************************************************
-
-		setFileItemsToList: function (listId, items) {
-			var output = [];
-			for (var i = 0, item; item = items[i]; i++) {
-				output.push('<li><strong>', item.name, '</strong></li>');
-			}
-
-			document.getElementById(listId).innerHTML =
-				'<ul>' + output.join('') + '</ul>';
-		}
 	});
 
 //=============================================================================
@@ -1319,24 +1099,22 @@ var utils = Utils(euSign);
 
 //=============================================================================
 
-function setPointerEvents(element, enable) {
+function setPointerEvents(element, enable) { // встановити події вказівника
 	element.style.pointerEvents = enable ? "auto" : "none";
 }
 
-function setStatus(message) {
+function setStatus(message) { // встановити статус
 	if (message != '')
 		message = '(' + message + '...)';
 	document.getElementById('status').innerHTML = message;
 }
 
-function saveFile(fileName, array) {
+function saveFile(fileName, array) { // зберегти файл
 	var blob = new Blob([array], { type: "application/octet-stream" });
 	saveAs(blob, fileName);
 }
 
-function pageLoaded() {
-	// document.getElementById('CertsAndCRLsFiles').addEventListener(
-	// 	'change', euSignTest.chooseCertsAndCRLs, false);
+function pageLoaded() { // сторінка завантажена
 	document.getElementById('PKeyFileInput').addEventListener(
 		'change', euSignTest.selectPrivateKeyFile, false);
 	document.getElementById('FileToSign').addEventListener(
@@ -1357,7 +1135,7 @@ function pageLoaded() {
 	appendMaxFileSizeLimit('ChooseFileForVerifyTextLabel');
 }
 
-function EUSignCPModuleInitialized(isInitialized) {
+function EUSignCPModuleInitialized(isInitialized) { // Модуль EUSign CP ініціалізовано
 	if (isInitialized)
 		euSignTest.initialize();
 	else

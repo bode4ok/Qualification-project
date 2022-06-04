@@ -16,9 +16,6 @@ $cur_Date = date('Y-m-d');
 	<meta http-equiv="pragma" content="no-cache">
 	<meta name="robots" content="index, follow">
 	<meta name="viewport" content="width=device-width">
-	<?php
-	echo '<link rel="stylesheet" type="text/css" href="Styles.css?' . $token . '">';
-	?>
 	<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-1BmE4kWBq78iYhFldvKuhfTAU6auU8tT94WrHftjDbrCEXSU1oBoqyl2QvZ6jIW3" crossorigin="anonymous">
 	<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js" integrity="sha384-ka7Sk0Gln4gmtz2MlQnikT1wXgYsOg+OMhuP+IlRH9sENBO0LRn5q+8nbTov4+1p" crossorigin="anonymous"></script>
 	<script type="text/javascript" src="JS/common.js"></script>
@@ -27,9 +24,6 @@ $cur_Date = date('Y-m-d');
 	<script type="text/JavaScript" src="JS/euscpm.js"></script>
 	<script async type="text/javascript" src="JS/euscp.js"></script>
 	<script type="text/JavaScript" src="JS/euscptest.js"></script>
-	<script type="text/javascript" src="JS/qr/qrcodedecode.js"></script>
-	<script type="text/javascript" src="JS/qr/reedsolomon.js"></script>
-	<script type="text/javascript" src="JS/fs/Blob.min.js"></script>
 	<script type="text/javascript" src="JS/fs/FileSaver.js"></script>
 	<script type="text/JavaScript">
 		function onBodyLoad() {
@@ -104,11 +98,11 @@ $cur_Date = date('Y-m-d');
 					</div>
 
 					<!-- -------- -->
-					<div id="PKCertsSelectZone" hidden=1>
-						<a id="ChoosePKCertsButton" style="cursor:pointer; pointer-events:auto;" href="javascript:void(0);" title="Оберіть" onclick="document.getElementById('ChoosePKCertsInput').click();"></a>
-						<input id="ChoosePKCertsInput" type="file" multiple="true"></input>
-						<output id="SelectedPKCertsList" style="padding-left:1em;"></output>
-					</div>
+					<!-- <div id="PKCertsSelectZone" hidden=1>
+						<a onclick="document.getElementById('ChoosePKCertsInput').click();"></a>
+						<input id="ChoosePKCertsInput" ></input>
+						<output id="SelectedPKCertsList"></output>
+					</div> -->
 					<!-- -------- -->
 
 				</div>
@@ -135,8 +129,6 @@ $cur_Date = date('Y-m-d');
 					<div class="" class="form-check" style="padding: 15px;">
 						<!-- style="background-color: #dfeefb;padding: 15px;" -->
 						<input class="form-check-input" type="checkbox" id="InternalSignCheckbox" class="Checkbox" onclick="euSignTest.useInternalSignCheckBoxClick()" /> Використовувати внутрішній підпис<br>
-						<input class="form-check-input" type="checkbox" id="AddCertToInternalSignCheckbox" class="Checkbox" disabled="disabled" /> Додавати сертифікат до внутрішнього підпису<br>
-						<input class="form-check-input" type="checkbox" id="SignHashCheckbox" class="Checkbox" onclick="euSignTest.signHashCheckBoxClick()" /> Підписувати геш<br>
 						<input class="form-check-input" type="checkbox" id="GetSignInfoCheckbox" class="Checkbox" checked="true" /> Отримувати інформацію про підпис<br><br>
 
 						<div class="TextLabel">Формат підпису:</div><br>
@@ -160,7 +152,7 @@ $cur_Date = date('Y-m-d');
 						<h5><span class="TextInTextImageContainer">Підпис документу</span></h5>
 					</div>
 
-					<div id="VerifiedDataText" disabled="disabled"></div>
+					
 
 					<div class="TextLabel" id="ChooseFileForSignTextLabel">Оберіть файл для підпису:</div><br>
 					<input class="form-control" id="FileToSign" type="file" class="SelectFile" name="files[]" disabled="disabled" style="margin-bottom:1em;" /><br>
@@ -188,7 +180,7 @@ $cur_Date = date('Y-m-d');
 
 					<div class="text-center p-4" style="background-color: rgba(0, 0, 0, 0.05);">
 						© 2022 Qualification project:
-						<a class="text-reset fw-bold" href="https://github.com/bode4ok">Bogdan Neruchok</a>
+						<a class="text-reset fw-bold" href="https://github.com/bode4ok/Qualification-project">Bogdan Neruchok (GitHub)</a>
 					</div>
 				</div>
 			</div>
