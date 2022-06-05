@@ -9,7 +9,6 @@ $cur_Date = date('Y-m-d');
 <head>
 	<title>ЕЦП</title>
 	<link rel="shortcut icon" href="/Images/key2.ico" type="image/x-icon">
-	<meta name="AUTHOR" content="Copyright JSC IIT. All rights reserved.">
 	<meta content="text/html; charset=utf-8" http-equiv="Content-Type">
 	<meta name="KEYWORDS" content="<?php echo $sWebMetaK; ?>">
 	<meta name="DESCRIPTION" content="<?php echo $sWebMetaD; ?>">
@@ -27,7 +26,6 @@ $cur_Date = date('Y-m-d');
 	<script type="text/javascript" src="JS/fs/FileSaver.js"></script>
 	<script type="text/JavaScript">
 		function onBodyLoad() {
-			// MM_preloadImages('Images/ButtonHover.png', 'Images/ButtonHover.png');
 			pageLoaded();
 		}
 	</script>
@@ -76,7 +74,6 @@ $cur_Date = date('Y-m-d');
 					<div class="col-6">
 						<div class="custom-file">
 							<label class="custom-file-label" for="customFile">Особистий ключ:</label>
-							<!-- <input id="PKeyFileInput" type="file" multiple="false"></input> -->
 							<div id="PKeyFileName" id="PKeyFileInput" class="PKeyFileNameEdit" readonly="true" onclick="document.getElementById('PKeyFileInput').click();" type="file" multiple="false"></div>
 							<div id="buttonitem">
 								<div id="PKeySelectFileButton" href="javascript:void(0);">
@@ -96,15 +93,6 @@ $cur_Date = date('Y-m-d');
 							<button type="button" class="btn btn-dark" id="PKeyReadButton" href="javascript:void(0);" title="Зчитати" onclick="euSignTest.readPrivateKeyButtonClick()">Зчитати</button>
 						</div>
 					</div>
-
-					<!-- -------- -->
-					<!-- <div id="PKCertsSelectZone" hidden=1>
-						<a onclick="document.getElementById('ChoosePKCertsInput').click();"></a>
-						<input id="ChoosePKCertsInput" ></input>
-						<output id="SelectedPKCertsList"></output>
-					</div> -->
-					<!-- -------- -->
-
 				</div>
 				<hr />
 
@@ -127,7 +115,6 @@ $cur_Date = date('Y-m-d');
 					</div>
 
 					<div class="" class="form-check" style="padding: 15px;">
-						<!-- style="background-color: #dfeefb;padding: 15px;" -->
 						<input class="form-check-input" type="checkbox" id="InternalSignCheckbox" class="Checkbox" onclick="euSignTest.useInternalSignCheckBoxClick()" /> Використовувати внутрішній підпис<br>
 						<input class="form-check-input" type="checkbox" id="GetSignInfoCheckbox" class="Checkbox" checked="true" /> Отримувати інформацію про підпис<br><br>
 
@@ -152,8 +139,6 @@ $cur_Date = date('Y-m-d');
 						<h5><span class="TextInTextImageContainer">Підпис документу</span></h5>
 					</div>
 
-					
-
 					<div class="TextLabel" id="ChooseFileForSignTextLabel">Оберіть файл для підпису:</div><br>
 					<input class="form-control" id="FileToSign" type="file" class="SelectFile" name="files[]" disabled="disabled" style="margin-bottom:1em;" /><br>
 
@@ -171,7 +156,6 @@ $cur_Date = date('Y-m-d');
 					<div class="TextLabel" id="ChooseFileWithSignTextLabel">Оберіть файл з підписом:</div><br>
 					<input id="FileWithSign" class="form-control" type="file" class="SelectFile" name="files[]" style="margin-bottom:1em;" /><br>
 
-
 					<div id="buttonitem" class="d-grid gap-2">
 						<button class="btn btn-primary" type="button" class="btn btn-dark" id="VerifyFileButton" href="javascript:void(0);" title="Перевірити" onclick="euSignTest.verifyFile()">Перевірити документ на наявнісь підпису</button>
 					</div>
@@ -186,7 +170,6 @@ $cur_Date = date('Y-m-d');
 			</div>
 		</div>
 	</div>
-	<!-- <div id="iit" display: none style = "display: none;"> -->
 </body>
 
 </html>

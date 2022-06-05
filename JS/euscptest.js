@@ -1,38 +1,9 @@
-//=============================================================================
-
-var URL_EMAIL_PARAM = "@EMAIL_PARAM";
-var URL_GET_KEP_CERTIFICATE_BY_EMAIL = "http://ca.iit.com.ua/services-cmp-getcert?eUserEMail=" +
-	URL_EMAIL_PARAM + "&certType=2&respType=2";
 
 var URL_GET_CERTIFICATES = "/Data/CACertificates.p7b?version=1.0.19";
 var URL_CAS = "/Data/CAs.json?version=1.0.19";
 var URL_XML_HTTP_PROXY_SERVICE = "/Server/ProxyHandler.php";
 
 //=============================================================================
-
-var SubjectCertTypes = [
-	{ "type": EU_SUBJECT_TYPE_UNDIFFERENCED, "subtype": EU_SUBJECT_CA_SERVER_SUB_TYPE_UNDIFFERENCED },
-	{ "type": EU_SUBJECT_TYPE_CA, "subtype": EU_SUBJECT_CA_SERVER_SUB_TYPE_UNDIFFERENCED },
-	{ "type": EU_SUBJECT_TYPE_CA_SERVER, "subtype": EU_SUBJECT_CA_SERVER_SUB_TYPE_UNDIFFERENCED },
-	{ "type": EU_SUBJECT_TYPE_CA_SERVER, "subtype": EU_SUBJECT_CA_SERVER_SUB_TYPE_CMP },
-	{ "type": EU_SUBJECT_TYPE_CA_SERVER, "subtype": EU_SUBJECT_CA_SERVER_SUB_TYPE_OCSP },
-	{ "type": EU_SUBJECT_TYPE_CA_SERVER, "subtype": EU_SUBJECT_CA_SERVER_SUB_TYPE_TSP },
-	{ "type": EU_SUBJECT_TYPE_END_USER, "subtype": EU_SUBJECT_CA_SERVER_SUB_TYPE_UNDIFFERENCED },
-	{ "type": EU_SUBJECT_TYPE_RA_ADMINISTRATOR, "subtype": EU_SUBJECT_CA_SERVER_SUB_TYPE_UNDIFFERENCED }
-];
-
-var CertKeyTypes = [
-	EU_CERT_KEY_TYPE_UNKNOWN,
-	EU_CERT_KEY_TYPE_DSTU4145,
-	EU_CERT_KEY_TYPE_RSA,
-	EU_CERT_KEY_TYPE_ECDSA
-];
-
-var KeyUsages = [
-	EU_KEY_USAGE_UNKNOWN,
-	EU_KEY_USAGE_DIGITAL_SIGNATURE,
-	EU_KEY_USAGE_KEY_AGREEMENT
-];
 
 var CAdESTypes = [
 	EU_SIGN_TYPE_CADES_BES,
@@ -99,8 +70,8 @@ var EUSignCPTest = NewClass({
 						}
 					}
 
-					euSignTest.loadCertsFromServer();
-					euSignTest.setCASettings(0);
+					euSignTest.loadCertsFromServer(); // ФУНКЦІЯ №-3
+					euSignTest.setCASettings(0); // ФУНКЦІЯ №-5
 
 					if (utils.IsSessionStorageSupported()) {
 						var _readPrivateKeyAsStoredFile = function () {
@@ -157,7 +128,7 @@ var EUSignCPTest = NewClass({
 				}
 			};
 
-			euSign.LoadDataFromServer(URL_CAS, _onSuccess, onError, false);
+			euSign.LoadDataFromServer(URL_CAS, _onSuccess, onError, false); // Завантаження файлу з веб-серверу
 		},
 
 		//3// завантажити сертифікати з сервера ****************************************************************************************************
@@ -201,34 +172,35 @@ var EUSignCPTest = NewClass({
 
 		setDefaultSettings: function () {
 			try {
-				euSign.SetXMLHTTPProxyService(URL_XML_HTTP_PROXY_SERVICE);
+				euSign.SetXMLHTTPProxyService(URL_XML_HTTP_PROXY_SERVICE); // Встановлення адресу проксі-сервісу HTTP-з’єднань бібліотеки
+																		   // Вхідний. Адреса проксі-сервісу HTTP-з’єднань бібліотеки
 
-				var settings = euSign.CreateFileStoreSettings();
+				var settings = euSign.CreateFileStoreSettings(); 		   // Створення порожнього об`єкту з параметрами файлового сховища
 				settings.SetPath("/certificates");
 				settings.SetSaveLoadedCerts(true);
 				euSign.SetFileStoreSettings(settings);
 
-				settings = euSign.CreateProxySettings();
+				settings = euSign.CreateProxySettings();                   // Створення порожнього об`єкту з параметрами Proxy-сервера
 				euSign.SetProxySettings(settings);
 
-				settings = euSign.CreateTSPSettings();
+				settings = euSign.CreateTSPSettings();                     // Створення порожнього об`єкту з параметрами TSP-сервера
 				euSign.SetTSPSettings(settings);
 
-				settings = euSign.CreateOCSPSettings();
+				settings = euSign.CreateOCSPSettings();                    // Створення порожнього об`єкту з параметрами OCSP-сервера
 				euSign.SetOCSPSettings(settings);
 
-				settings = euSign.CreateCMPSettings();
+				settings = euSign.CreateCMPSettings();                     // Створення порожнього об`єкту з параметрами CMP-сервера
 				euSign.SetCMPSettings(settings);
 
-				settings = euSign.CreateLDAPSettings();
+				settings = euSign.CreateLDAPSettings();                    // Створення порожнього об`єкту з параметрами LDAP -сервера
 				euSign.SetLDAPSettings(settings);
 
-				settings = euSign.CreateOCSPAccessInfoModeSettings();
+				settings = euSign.CreateOCSPAccessInfoModeSettings();      // Створення порожнього об`єкту з параметрами використання точок доступу до OCSP -серверів
 				settings.SetEnabled(true);
 				euSign.SetOCSPAccessInfoModeSettings(settings);
 
 				var CAs = this.CAsServers;
-				settings = euSign.CreateOCSPAccessInfoSettings();
+				settings = euSign.CreateOCSPAccessInfoSettings();          // Створення порожнього об`єкту з параметрами точки доступу до OCSP -сервера
 				for (var i = 0; i < CAs.length; i++) {
 					settings.SetAddress(CAs[i].ocspAccessPointAddress);
 					settings.SetPort(CAs[i].ocspAccessPointPort);
@@ -263,7 +235,7 @@ var EUSignCPTest = NewClass({
 
 				var settings;
 
-				settings = euSign.CreateTSPSettings();
+				settings = euSign.CreateTSPSettings(); // Створення порожнього об`єкту з параметрами TSP-сервера
 				if (!offline) {
 					settings.SetGetStamps(true);
 					if (caServer.tspAddress != "") {
@@ -276,7 +248,7 @@ var EUSignCPTest = NewClass({
 				}
 				euSign.SetTSPSettings(settings);
 
-				settings = euSign.CreateOCSPSettings();
+				settings = euSign.CreateOCSPSettings(); // Створення порожнього об`єкту з параметрами OCSP-сервера
 				if (!offline) {
 					settings.SetUseOCSP(true);
 					settings.SetBeforeStore(true);
@@ -285,7 +257,7 @@ var EUSignCPTest = NewClass({
 				}
 				euSign.SetOCSPSettings(settings);
 
-				settings = euSign.CreateCMPSettings();
+				settings = euSign.CreateCMPSettings(); // Створення порожнього об`єкту з параметрами CMP-сервера
 				settings.SetUseCMP(useCMP);
 				if (useCMP) {
 					settings.SetAddress(caServer.cmpAddress);
@@ -293,7 +265,7 @@ var EUSignCPTest = NewClass({
 				}
 				euSign.SetCMPSettings(settings);
 
-				settings = euSign.CreateLDAPSettings();
+				settings = euSign.CreateLDAPSettings(); // Створення порожнього об`єкту з параметрами LDAP -сервера
 				euSign.SetLDAPSettings(settings);
 			} catch (e) {
 				alert("Виникла помилка при встановленні налашувань: " + e);
@@ -397,11 +369,11 @@ var EUSignCPTest = NewClass({
 
 		//10// отримати сертифікати приватного ключа від CMP ****************************************************************************************************
 
-		getPrivateKeyCertificatesByCMP: function (key, password, onSuccess, onError) {
+		getPrivateKeyCertificatesByCMP: function (key, password, onSuccess, onError) { // Отримання сертифіката користувача за відкритої інформацією про особистий ключ
 			try {
 				var cmpAddress = euSignTest.getCAServer().cmpAddress + ":80";
 				var keyInfo = euSign.GetKeyInfoBinary(key, password);
-				onSuccess(euSign.GetCertificatesByKeyInfo(keyInfo, [cmpAddress]));
+				onSuccess(euSign.GetCertificatesByKeyInfo(keyInfo, [cmpAddress])); // Вхідний. Відкрита інформація про особистий ключ // Вхідний. Адреса CMP-серверів ЦСК
 			} catch (e) {
 				onError(e);
 			}
@@ -460,14 +432,14 @@ var EUSignCPTest = NewClass({
 				}
 
 				if (e.GetErrorCode != null &&
-					e.GetErrorCode() == EU_ERROR_CERT_NOT_FOUND) {
+					e.GetErrorCode() == EU_ERROR_CERT_NOT_FOUND) { // Сертифікат не знайдено
 				}
 			};
 
 			if (certificates == null) {
 				var _onGetCertificates = function (certs) {
 					if (certs == null) {
-						_onError(euSign.MakeError(EU_ERROR_CERT_NOT_FOUND));
+						_onError(euSign.MakeError(EU_ERROR_CERT_NOT_FOUND)); // Сертифікат не знайдено
 						return;
 					}
 
@@ -600,7 +572,7 @@ var EUSignCPTest = NewClass({
 
 		showOwnerInfo: function () {
 			try {
-				var ownerInfo = euSign.GetPrivateKeyOwnerInfo();
+				var ownerInfo = euSign.GetPrivateKeyOwnerInfo(); // Отримання інформації про власника ключа
 
 				alert("Власник: " + ownerInfo.GetSubjCN() + "\n" +
 					"ЦСК: " + ownerInfo.GetIssuerCN() + "\n" +
@@ -617,8 +589,8 @@ var EUSignCPTest = NewClass({
 				var splitLine = "--------------------------------------------------";
 				var message = "Інформація про сертифікат(и) користувача:\n";
 				var i = 0;
-				while (true) {
-					var info = euSign.EnumOwnCertificates(i);
+				while (true) { // Перелічення наявних сертифікатів користувача
+					var info = euSign.EnumOwnCertificates(i); // Вхідний. Індекс сертифіката
 					if (info == null)
 						break;
 
@@ -656,18 +628,18 @@ var EUSignCPTest = NewClass({
 			try {
 				var keyIndex = 0;
 				while (true) {
-					var keyAlias = euSign.EnumJKSPrivateKeys(jksContainer, keyIndex);
+					var keyAlias = euSign.EnumJKSPrivateKeys(jksContainer, keyIndex); // Перелічення особистих ключів в контейнері JKS. Повертається alias ім’я особистого ключа
 					if (keyAlias == null)
 						break;
-					var jksKey = euSign.GetJKSPrivateKey(jksContainer, keyAlias);
+					var jksKey = euSign.GetJKSPrivateKey(jksContainer, keyAlias); // Отримання особистого ключа з контейнера JKS 
 
 					info += (keyIndex + 1) + '\n';
 					info += 'Alias ключа: ' + keyAlias + '\n';
 					info += 'Сертифікати: ' + '\n';
 
-					for (var i = 0; i < jksKey.GetCertificatesCount(); i++) {
+					for (var i = 0; i < jksKey.GetCertificatesCount(); i++) { // Об’єкт, що містить інформацію про криптографічний заголовок ?*
 						var cert = jksKey.GetCertificate(i);
-						var certInfo = euSign.ParseCertificate(cert);
+						var certInfo = euSign.ParseCertificate(cert); // Отримання інформації про сертифікат
 						info += "Сертифікат № " + (i + 1) + '\n';
 						info += "Власник: " + certInfo.GetSubject() + '\n';
 						info += "ЦСК: " + certInfo.GetIssuer() + '\n';
@@ -742,17 +714,17 @@ var EUSignCPTest = NewClass({
 
 				info += 'Інформація про зчитаний ключ:\n';
 				try {
-					if (euSign.IsPrivateKeyReaded()) {
+					if (euSign.IsPrivateKeyReaded()) { // Перевірка наявності зчитаного особистого ключа
 						var i = 0;
 						while (true) {
-							var certInfo = euSign.EnumOwnCertificates(i);
+							var certInfo = euSign.EnumOwnCertificates(i); // Перелічення наявних сертифікатів користувача // Вхідний. Індекс сертифіката
 							if (certInfo == null)
 								break;
-							var cert = euSign.GetCertificate(
-								certInfo.GetIssuer(), certInfo.GetSerial());
+							var cert = euSign.GetCertificate( // Отримання сертифіката користувача
+								certInfo.GetIssuer(), certInfo.GetSerial()); // Вхідний. Реквізити ЦСК // Вхідний. Серійний номер сертифіката
 
 							info += "Сертифікат № " + (i + 1) + '\n';
-							info += "Власник: " + certInfo.GetSubject() + '\n';
+							info += "Власник: " + certInfo.GetSubject() + '\n'; // Об’єкт, що містить інформацію про власника сертифіката
 							info += "ЦСК: " + certInfo.GetIssuer() + '\n';
 							info += "Реєстраційний номер: " + certInfo.GetSerial() + '\n';
 							info += "Призначення: " + certInfo.GetKeyUsage() + '\n';
@@ -785,9 +757,9 @@ var EUSignCPTest = NewClass({
 				try {
 					var sign = "";
 
-						if (isInternalSign) {
+						if (isInternalSign) { // Формування внутрішнього (підпис знаходиться разом з даними) ЕЦП
 							sign = euSign.SignDataInternal(false, data, true);
-						} else {
+						} else { // Формування зовнішнього (підпис знаходиться окремо від даних) електронного цифрового підпису (ЕЦП)
 								sign = euSign.SignData(data, true);
 						}
 
@@ -805,17 +777,17 @@ var EUSignCPTest = NewClass({
 
 		//20// ОТРИМАТИ ФОРМАТУ ПІДПИСУ //****************************************************************************************************
 
-		getSignTypeString: function (signType) {
+		getSignTypeString: function (signType) { // Отримання інформації про тип підпису
 			switch (signType) {
-				case EU_SIGN_TYPE_CADES_BES:
+				case EU_SIGN_TYPE_CADES_BES: // CAdES-BES
 					return 'базовий';
-				case EU_SIGN_TYPE_CADES_T:
+				case EU_SIGN_TYPE_CADES_T: // CAdES-T
 					return 'з позначкою часу від ЕЦП';
-				case EU_SIGN_TYPE_CADES_C:
+				case EU_SIGN_TYPE_CADES_C: // CAdES-C
 					return 'з посиланням на повні дані для перевірки';
-				case EU_SIGN_TYPE_CADES_X_LONG:
+				case EU_SIGN_TYPE_CADES_X_LONG: // CAdES-X Long
 					return 'з повними даними для перевірки';
-				case EU_SIGN_TYPE_CADES_X_LONG | EU_SIGN_TYPE_CADES_X_LONG_TRUSTED:
+				case EU_SIGN_TYPE_CADES_X_LONG | EU_SIGN_TYPE_CADES_X_LONG_TRUSTED: // CAdES-X Long Trusted
 					return 'з повними даними ЦСК для перевірки';
 				default:
 					return 'невизначено';
@@ -824,21 +796,21 @@ var EUSignCPTest = NewClass({
 
 		//21// ПЕРЕВІРКА ПІДПИСУ (ВИВІД ІНВОРМАЦІЇ В АЛЕРТ) //****************************************************************************************************
 
-		verifyData: function () {
+		verifyData: function () { // Перевірка зовнішнього ЕЦП
 			var isInternalSign =
 				document.getElementById("InternalSignCheckbox").checked;
 			var isGetSignerInfo =
 				document.getElementById("GetSignInfoCheckbox").checked;
 
-			var _verifyDataFunction = function () {
+			var _verifyDataFunction = function () { // Перевірка зовнішнього ЕЦП
 				try {
 					var info = "";
 
 					var message = "Підпис успішно перевірено";
 
 					if (isGetSignerInfo) {
-						var ownerInfo = info.GetOwnerInfo();
-						var timeInfo = info.GetTimeInfo();
+						var ownerInfo = info.GetOwnerInfo(); // Об’єкт, що містить інформацію про відправника зашифрованих даних ?*
+						var timeInfo = info.GetTimeInfo(); // Об’єкт, що містить інформацію про підпис ?*
 
 						message += "\n";
 						message += "Підписувач: " + ownerInfo.GetSubjCN() + "\n" +
@@ -947,18 +919,19 @@ var EUSignCPTest = NewClass({
 				try {
 					var info = "";
 					if (isInternalSign) {
-						info = euSign.VerifyDataInternal(files[0].data);
+						info = euSign.VerifyDataInternal(files[0].data); // Перевірка внутрішнього ЕЦП
+
 					} else {
-						info = euSign.VerifyData(files[0].data, files[1].data);
+						info = euSign.VerifyData(files[0].data, files[1].data); // Перевірка зовнішнього ЕЦП
 					}
-					var signType = pThis.getSignTypeString(
-						euSign.GetSignType(0, files[isInternalSign ? 0 : 1].data));
+					var signType = pThis.getSignTypeString(  // ФУНКЦІЯ №-20
+						euSign.GetSignType(0, files[isInternalSign ? 0 : 1].data)); // Отримання інформації про тип підпису
 
 					var message = "Підпис успішно перевірено";
 
 					if (isGetSignerInfo) {
-						var ownerInfo = info.GetOwnerInfo();
-						var timeInfo = info.GetTimeInfo();
+						var ownerInfo = info.GetOwnerInfo(); // Об’єкт, що містить інформацію про відправника зашифрованих даних ?*
+						var timeInfo = info.GetTimeInfo(); // Об’єкт, що містить інформацію про підпис ?*
 
 						message += "\n";
 						message += "Підписувач: " + ownerInfo.GetSubjCN() + "\n" +
@@ -966,7 +939,7 @@ var EUSignCPTest = NewClass({
 							"Серійний номер: " + ownerInfo.GetSerial() + "\n";
 						if (timeInfo.IsTimeAvail()) {
 							message += (timeInfo.IsTimeStamp() ?
-								"Мітка часу (від даних):" : "Час підпису: ") + timeInfo.GetTime();
+								"Мітка часу (від даних):" : "Час підпису: ") + timeInfo.GetTime(); // Об’єкт, що містить інформацію про час підпису
 						} else {
 							message += "Час підпису відсутній";
 						}
@@ -1015,8 +988,8 @@ var EUSignCPTest = NewClass({
 
 		//25// ОБРАННЯ ФОРМАТУ ПІДПИСУ З ВИПАДАЮЧОГО СПИСКУ ****************************************************************************************************
 
-		DSCAdESTypeChanged: function () {
-			var signType = CAdESTypes[
+		DSCAdESTypeChanged: function () { 
+			var signType = CAdESTypes[ // Тип підпису. За замовчанням параметр дорівнює EU_SIGN_TYPE_CADES_BES
 				document.getElementById('DSCAdESTypeSelect').selectedIndex];
 			try {
 				euSign.SetRuntimeParameter(EU_SIGN_TYPE_PARAMETER, signType);
@@ -1033,8 +1006,10 @@ var EUSignCPTest = NewClass({
 
 		signAddContentTimestampCheckBoxClick: function () {
 			try {
-				euSign.SetRuntimeParameter(EU_SIGN_INCLUDE_CONTENT_TIME_STAMP_PARAMETER,
-					document.getElementById('SignAddContentTimestampCheckbox').checked);
+				euSign.SetRuntimeParameter(EU_SIGN_INCLUDE_CONTENT_TIME_STAMP_PARAMETER, 
+					document.getElementById('SignAddContentTimestampCheckbox').checked); // Признак необхідності додавання позначки часу від данних. За замовчанням
+					// параметр дорівнює TRUE. Позначка часу буде додаватися лише за умов використання TSP-сервера в онлайн режимі роботи бібліотеки
+
 			} catch (e) {
 				alert(e);
 			}
@@ -1045,7 +1020,9 @@ var EUSignCPTest = NewClass({
 		signAddCAsCertificatesCheckBoxClick: function () {
 			try {
 				euSign.SetRuntimeParameter(EU_SIGN_INCLUDE_CA_CERTIFICATES_PARAMETER,
-					document.getElementById('SignAddCAsCertificatesCheckbox').checked);
+					document.getElementById('SignAddCAsCertificatesCheckbox').checked);// Признак необхідності додавати сертифікати ЦСК для підписів з типом -
+					// EU_SIGN_TYPE_CADES_C та EU_SIGN_TYPE_CADES_X_LONG. За замовчанням параметр дорівнює TRUE
+
 			} catch (e) {
 				alert(e);
 			}
